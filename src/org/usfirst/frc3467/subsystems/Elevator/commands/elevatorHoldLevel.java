@@ -2,33 +2,52 @@ package org.usfirst.frc3467.subsystems.Elevator.commands;
 
 import org.usfirst.frc3467.commands.CommandBase;
 
-/**
- *	Move elevator to a specified position (units = encoder counts)
- */
-public class elevatorToPosition extends CommandBase {
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-	double	position;
+/**
+ *	Drive to an elevator level and stay there until interrupted
+ */
+public class elevatorHoldLevel extends CommandBase {
+
+	int	m_level;
+	double m_position;
 	
-    public elevatorToPosition(double pos) {
+    public elevatorHoldLevel(int level) {
     	requires(elevator);
-    	position = pos;
-    	if (position < 0) position = 0;	// Never go below zero
+    	this.setInterruptible(true);
+    	m_level = level;
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    	m_position = elevator.getPositionForLevel(m_level);
+    	SmartDashboard.putNumber("elevatorHold", m_position);
+    	if (m_position == -1)	// Bad level specified
+    		return;
+
     	elevator.initPositionalMode();
+
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	elevator.gotoPosition(position);
+    	if (m_position == -1)	// Bad level specified
+    		return;
+
+    	elevator.gotoPosition(m_position);
     }
 
     // This command will never finish - it always must be interrupted.
     // The one exception is when it is at the very bottom (zero) position,
     // in which case it does not need to continue running.
     protected boolean isFinished() {
+    	if (m_position == -1)	// Bad level specified
+    		return true;
+  
+    	if (elevator.onTarget())
+    		// Be sure to set the current level
+    		elevator.setLevel(m_level);
+
     	if (elevator.isZero())
     		return true;
     	else
@@ -39,7 +58,7 @@ public class elevatorToPosition extends CommandBase {
     protected void end() {
     	
     	elevator.disablePID();
-    	
+    
     }
 
     // Called when another command which requires one or more of the same

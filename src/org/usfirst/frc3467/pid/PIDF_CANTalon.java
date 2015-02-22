@@ -91,7 +91,10 @@ public class PIDF_CANTalon implements LiveWindowSendable {
         m_I = i;
         m_D = d;
 
-        m_talon.setPID(p, i, d);
+        m_talon.setProfile(0);
+        m_talon.setP(p);
+        m_talon.setI(i);
+        m_talon.setD(d);
         
         if (table != null) {
             table.putNumber("p", p);
@@ -120,7 +123,10 @@ public class PIDF_CANTalon implements LiveWindowSendable {
         m_D = d;
         m_F = f;
 
-        m_talon.setPID(p, i, d);
+        m_talon.setProfile(0);
+        m_talon.setP(p);
+        m_talon.setI(i);
+        m_talon.setD(d);
         m_talon.setF(f);
         
         if (table != null) {
@@ -178,6 +184,8 @@ public class PIDF_CANTalon implements LiveWindowSendable {
     	m_setpoint = setpoint;
     	m_talon.set(setpoint);;
 
+    	reportPosition(m_talon.getPosition());
+    	
         if (table != null)
             table.putNumber("setpoint", m_setpoint);
         
@@ -211,8 +219,9 @@ public class PIDF_CANTalon implements LiveWindowSendable {
      * @return the current position
      */
     public synchronized double getPosition() {
-    	reportPosition(m_talon.getPosition());	
-    	return m_talon.getPosition();
+    	double pos = m_talon.getPosition();
+    	reportPosition(pos);	
+    	return pos;
 
     }
 
