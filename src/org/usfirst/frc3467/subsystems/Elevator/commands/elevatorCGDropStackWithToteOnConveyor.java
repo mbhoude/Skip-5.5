@@ -9,25 +9,25 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /**
  *
  */
-public class elevatorCGDropStack extends CommandGroup {
+public class elevatorCGDropStackWithToteOnConveyor extends CommandGroup {
     
-    public  elevatorCGDropStack() {
+    public  elevatorCGDropStackWithToteOnConveyor() {
 
     	// Lift stack above Indexer
-    	SmartDashboard.putString("elevatorCGDropStack", "elevatorToPosition(indexTote, 3.0)");
-    	addSequential(new elevatorToPosition(Elevator.kLevelIndexTote, 3.0));
+    	SmartDashboard.putString("elevatorCGDropStack", "elevatorToPosition(LevelOne, 3.0)");
+    	addSequential(new elevatorToPosition(Elevator.kLevelDropStackWithToteOnConveyor , 3.0));
 
     	// Unengage Indexer
     	SmartDashboard.putString("elevatorCGDropStack", "indexerOperate(false)");
     	addSequential(new indexerOperate(false));
     	
-    	// Wait a couple secs
+    	// Wait a sec
     	SmartDashboard.putString("elevatorCGDropStack", "WaitCommand(2.0)");
     	addSequential(new WaitCommand(2.0));
     	
     	// Lower conveyor back to "resting position" in two steps: manual@fixed speed, then PID to hold
-    	SmartDashboard.putString("elevatorCGDropStack", "elevatorDriveToPosition(LevelZero, kDown_Fixed)");
-    	addSequential(new elevatorDriveToPosition(Elevator.kDown_Fixed, Elevator.kLevelZero));
+    	SmartDashboard.putString("elevatorCGDropStack", "elevatorDriveToPosition(LevelZero, kDown_Fixed - 0.1)");
+    	addSequential(new elevatorDriveToPosition(Elevator.kDown_Fixed - 0.1, Elevator.kLevelZero));
     	
     	SmartDashboard.putString("elevatorCGDropStack", "elevatorToPosition(LevelZero, 3.0)");
     	addSequential(new elevatorToPosition(Elevator.kLevelZero));

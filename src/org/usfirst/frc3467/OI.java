@@ -9,9 +9,14 @@ import org.usfirst.frc3467.control.Gamepad;
 import org.usfirst.frc3467.subsystems.Elevator.Elevator;
 import org.usfirst.frc3467.subsystems.Elevator.commands.conveyorDrive;
 import org.usfirst.frc3467.subsystems.Elevator.commands.elevatorCGAddTote;
+import org.usfirst.frc3467.subsystems.Elevator.commands.elevatorCGDropStackWithToteOnConveyor;
+import org.usfirst.frc3467.subsystems.Elevator.commands.elevatorCGNextLevel;
+import org.usfirst.frc3467.subsystems.Elevator.commands.elevatorCGIndexSidewaysRC;
+import org.usfirst.frc3467.subsystems.Elevator.commands.elevatorCGIndexUprightRC;
 import org.usfirst.frc3467.subsystems.Elevator.commands.elevatorCalibrate;
 import org.usfirst.frc3467.subsystems.Elevator.commands.elevatorDrive;
 import org.usfirst.frc3467.subsystems.Elevator.commands.elevatorCGDropStack;
+import org.usfirst.frc3467.subsystems.Elevator.commands.elevatorDriveToFloor;
 import org.usfirst.frc3467.subsystems.Elevator.commands.elevatorHoldLevel;
 import org.usfirst.frc3467.subsystems.Elevator.commands.elevatorLevelsUpDown;
 import org.usfirst.frc3467.subsystems.Elevator.commands.elevatorUpdatePIDF;
@@ -45,8 +50,13 @@ public class OI {
 	
 	public void BindCommands() {
 
-		// Elevator/Conveyor/Indexer Commands
-		new DoubleButton(operatorGamepad, 11, 12).whenActive(new elevatorCalibrate());
+		/*
+		 * Elevator/Conveyor/Indexer Commands
+		 */
+		
+		// Calibrate
+		new DoubleButton(operatorGamepad, 11, 12)
+			.whenActive(new elevatorCalibrate());
 
 		// Drive Elevator Up - Fixed Speed
 		new JoystickButton(operatorGamepad, Gamepad.leftBumper)
@@ -56,13 +66,13 @@ public class OI {
 		new JoystickButton(operatorGamepad, Gamepad.rightBumper)
 			.whileHeld(new elevatorDrive(Elevator.kDown_Fixed));
 		
-		// Engage Indexer
+		// Index Tote
 		new JoystickButton(operatorGamepad, Gamepad.leftTrigger)
-			.whenPressed(new indexerOperate(true));
+			.whenPressed(new elevatorCGAddTote());
 		
-		// Retract Indexer
+		// Drop Stack
 		new JoystickButton(operatorGamepad, Gamepad.rightTrigger)
-			.whenPressed(new indexerOperate(false));
+			.whenPressed(new elevatorCGDropStackWithToteOnConveyor());
 		
 		// Conveyor - Spit Out Slow
 		new JoystickButton(operatorGamepad, Gamepad.xButton)
@@ -70,20 +80,20 @@ public class OI {
 		
 		// Conveyor - Intake Slow
 		new JoystickButton(operatorGamepad, Gamepad.aButton)
-			.whileHeld (new conveyorDrive(-0.25));
+			.whileHeld (new conveyorDrive(-0.30));
 	
 		// Conveyor Intake - Fast
 		new JoystickButton(operatorGamepad, Gamepad.bButton)
-			.whileHeld(new conveyorDrive(-0.5));
+			.whileHeld(new conveyorDrive(-0.60));
 	
 		// Conveyor - Spit Out Fast
 		new JoystickButton(operatorGamepad, Gamepad.yButton)
 			.whileHeld(new conveyorDrive(0.5));
 		
- 		new DPadUp(operatorGamepad).whenActive(new elevatorHoldLevel(0));
- 		new DPadRight(operatorGamepad).whenActive(new elevatorHoldLevel(1));
- 		new DPadDown(operatorGamepad).whenActive(new elevatorHoldLevel(2));
- 		new DPadLeft(operatorGamepad).whenActive(new elevatorHoldLevel(3));
+ 		new DPadUp(operatorGamepad).whenActive(new elevatorCGNextLevel(true));
+ 		new DPadRight(operatorGamepad).whenActive(new elevatorHoldLevel(0));
+ 		new DPadDown(operatorGamepad).whenActive(new elevatorCGNextLevel(false));
+ 		new DPadLeft(operatorGamepad).whenActive(new elevatorDriveToFloor());
  		
  		{
 //			new elevatorCGAddTote();
@@ -105,7 +115,11 @@ public class OI {
 		// SmartDashboard Buttons
 		SmartDashboard.putData("Update Elevator PID", new elevatorUpdatePIDF());
 		SmartDashboard.putData("Update IMU Display", new imuUpdateDisplay());
-		
+		SmartDashboard.putData("Indexer Engage", new indexerOperate(true));
+		SmartDashboard.putData("Indexer Retract", new indexerOperate(false));
+		SmartDashboard.putData("Drop Stack (no tote on conveyor)", new elevatorCGDropStack());
+		SmartDashboard.putData("IndexUprightRC", new elevatorCGIndexSidewaysRC());
+		SmartDashboard.putData("IndexsidewaysRC", new elevatorCGIndexUprightRC());
 		/*
  		SmartDashboard.putData("Drive Backward", new DriveForward(-2.25));
 		SmartDashboard.putData("Start Rollers", new SetCollectionSpeed(Collector.FORWARD));
